@@ -32,3 +32,14 @@ const blogs = [
 export const getAll = () => {
   return blogs;
 };
+
+export const addBlog = (title: string, author: string, url: string) => {
+  const newBlog = {
+    id: blogs.length + 1,
+    title,
+    author,
+    url,
+    likes: 0,
+  };
+  blogs.push(newBlog);
+};
