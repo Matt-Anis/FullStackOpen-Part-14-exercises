@@ -1,64 +1,33 @@
-const blogs = [
-  {
-    id: 1,
-    title: "React patterns",
-    author: "Michael Chan",
-    url: "https://reactpatterns.com/",
-    likes: 7,
-  },
-  {
-    id: 2,
-    title: "Go To Statement Considered Harmful",
-    author: "Edsger W. Dijkstra",
-    url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
-    likes: 5,
-  },
-  {
-    id: 3,
-    title: "Canonical string reduction",
-    author: "Edsger W. Dijkstra",
-    url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
-    likes: 12,
-  },
-  {
-    id: 4,
-    title: "First class tests",
-    author: "Robert C. Martin",
-    url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
-    likes: 10,
-  },
-];
+import { blogs } from "@/db/schema";
+import { db } from "@/db";
+import { eq, or, ilike, sql } from "drizzle-orm";
 
-export const getAll = () => {
-  return blogs;
+export const getAll = async () => {
+  return db.query.blogs.findMany();
 };
 
-export const getById = (id: number) => {
-  return blogs.find((blog) => blog.id === id);
+export const getById = async (id: number) => {
+  return db.query.blogs.findFirst({
+    where: eq(blogs.id, id),
+  });
 };
 
-export const getByKeyword = (keyword: string) => {
-  return blogs.filter(
-    (blog) =>
-      blog.title.toLowerCase().includes(keyword.toLowerCase()) ||
-      blog.author.toLowerCase().includes(keyword.toLowerCase()),
-  );
+export const getByKeyword = async (keyword: string) => {
+  return db.query.blogs.findMany({
+    where: or(
+      ilike(blogs.author, `%${keyword}%`),
+      ilike(blogs.title, `%${keyword}%`),
+    ),
+  });
 };
 
-export const likeBlog = (id: number) => {
-  const blog = blogs.find((blog) => blog.id === id);
-  if (blog) {
-    blog.likes += 1;
-  }
+export const likeBlog = async (id: number) => {
+  await db
+    .update(blogs)
+    .set({ likes: sql`${blogs.likes} + 1` })
+    .where(eq(blogs.id, id));
 };
 
-export const addBlog = (title: string, author: string, url: string) => {
-  const newBlog = {
-    id: blogs.length + 1,
-    title,
-    author,
-    url,
-    likes: 0,
-  };
-  blogs.push(newBlog);
+export const addBlog = async (title: string, author: string, url: string) => {
+  return db.insert(blogs).values({ title, author, url });
 };

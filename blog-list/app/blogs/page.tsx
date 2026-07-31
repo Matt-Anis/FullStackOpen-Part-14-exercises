@@ -8,7 +8,7 @@ const Blogs = async ({
   searchParams: Promise<{ filter?: string }>;
 }) => {
   const { filter } = await searchParams;
-  const blogs = filter ? getByKeyword(filter) : getAll();
+  const blogs = filter ? await getByKeyword(filter) : await getAll();
   [...blogs].sort((a, b) => b.likes - a.likes);
 
   return (
