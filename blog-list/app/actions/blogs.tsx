@@ -19,3 +19,9 @@ export const likeBlog = async (formData: FormData) => {
   updateBlogLikes(id);
   revalidatePath(`/blogs/${id}`);
 };
+
+export const searchBlogs = async (formData: FormData) => {
+  const keyword = formData.get("keyword") as string;
+  if (!keyword.trim()) redirect("/blogs");
+  redirect(`/blogs?filter=${encodeURIComponent(keyword)}`);
+};

@@ -37,6 +37,14 @@ export const getById = (id: number) => {
   return blogs.find((blog) => blog.id === id);
 };
 
+export const getByKeyword = (keyword: string) => {
+  return blogs.filter(
+    (blog) =>
+      blog.title.toLowerCase().includes(keyword.toLowerCase()) ||
+      blog.author.toLowerCase().includes(keyword.toLowerCase()),
+  );
+};
+
 export const likeBlog = (id: number) => {
   const blog = blogs.find((blog) => blog.id === id);
   if (blog) {
