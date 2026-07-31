@@ -33,6 +33,10 @@ export const getAll = () => {
   return blogs;
 };
 
+export const getById = (id: number) => {
+  return blogs.find((blog) => blog.id === id);
+};
+
 export const addBlog = (title: string, author: string, url: string) => {
   const newBlog = {
     id: blogs.length + 1,
