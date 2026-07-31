@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { addBlog } from "../services/blogs";
+import { addBlog, likeBlog as updateBlogLikes } from "../services/blogs";
 
 export const createBlog = async (formData: FormData) => {
   const title = formData.get("title") as string;
@@ -12,4 +12,10 @@ export const createBlog = async (formData: FormData) => {
 
   revalidatePath("/blogs");
   redirect("/blogs");
+};
+
+export const likeBlog = async (formData: FormData) => {
+  const id = Number(formData.get("id"));
+  updateBlogLikes(id);
+  revalidatePath(`/blogs/${id}`);
 };
