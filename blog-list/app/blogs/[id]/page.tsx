@@ -21,7 +21,7 @@ const BlogPage = async ({ params }: { params: Promise<{ id: string }> }) => {
       <p>Likes: {blog.likes}</p>
       <p>
         created by:{" "}
-        <Link href={`/users/${blog.user.id}`}>{blog.user.username}</Link>
+        <Link href={`/users/${blog.user.username}`}>{blog.user.username}</Link>
       </p>
       <form action={likeBlog}>
         <input type="hidden" name="id" value={blog.id} />
