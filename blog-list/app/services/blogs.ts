@@ -9,6 +9,7 @@ export const getAll = async () => {
 export const getById = async (id: number) => {
   return db.query.blogs.findFirst({
     where: eq(blogs.id, id),
+    with: { user: true },
   });
 };
 
@@ -18,6 +19,7 @@ export const getByKeyword = async (keyword: string) => {
       ilike(blogs.author, `%${keyword}%`),
       ilike(blogs.title, `%${keyword}%`),
     ),
+    with: { user: true },
   });
 };
 
@@ -29,5 +31,5 @@ export const likeBlog = async (id: number) => {
 };
 
 export const addBlog = async (title: string, author: string, url: string) => {
-  return db.insert(blogs).values({ title, author, url });
+  return db.insert(blogs).values({ title, author, url, userId: 1 }); // TODO: should fix this to use real user id
 };
