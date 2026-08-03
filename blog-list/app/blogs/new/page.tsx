@@ -16,14 +16,14 @@ const NewBlog = () => {
       <h1>Create new</h1>
       <form action={createBlog}>
         <div>
-          title: <input name="title" />
+          title: <input name="title" required minLength={5} />
         </div>
         <div>
           <div>
-            author: <input name="author" />
+            author: <input name="author" required minLength={5} />
           </div>
           <div>
-            url: <input name="url" />
+            url: <input name="url" required minLength={5} />
           </div>
         </div>
         <button type="submit">create</button>
