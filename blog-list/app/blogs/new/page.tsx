@@ -23,7 +23,7 @@ const NewBlog = () => {
           <input
             name="title"
             required
-            minLength={1}
+            minLength={5}
             defaultValue={state.values?.title}
           />
           {state.errors.title && (
@@ -36,7 +36,7 @@ const NewBlog = () => {
             <input
               name="author"
               required
-              minLength={1}
+              minLength={5}
               defaultValue={state.values?.author}
             />
             {state.errors.author && (
@@ -48,7 +48,7 @@ const NewBlog = () => {
             <input
               name="url"
               required
-              minLength={1}
+              minLength={5}
               defaultValue={state.values?.url}
             />
             {state.errors.url && (
