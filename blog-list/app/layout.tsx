@@ -10,11 +10,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body className="min-h-screen flex flex-col">
         <AuthSessionsProviders>
           <NavBar />
           <Notification />
-          {children}
+          <main className="flex-1 flex my-4 mx-10">{children}</main>
         </AuthSessionsProviders>
       </body>
     </html>
