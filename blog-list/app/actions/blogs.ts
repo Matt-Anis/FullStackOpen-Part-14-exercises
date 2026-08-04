@@ -113,3 +113,22 @@ export const removeBlogFromReadingListOfCurrentUser = async (
 
   revalidatePath(`/blogs/${blogId}`);
 };
+
+export const markBlogAsReadForCurrentUser = async (blogId: number) => {
+  const session = await auth();
+  if (!session?.user?.id) {
+    throw new Error("Unauthorized");
+  }
+
+  await db
+    .update(readingList)
+    .set({ read: true })
+    .where(
+      and(
+        eq(readingList.userId, Number(session.user.id)),
+        eq(readingList.blogId, blogId),
+      ),
+    );
+
+  revalidatePath("/me");
+};

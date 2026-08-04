@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getCurrentUser, generateUserToken } from "../actions/users";
 import Link from "next/link";
+import { markBlogAsReadForCurrentUser } from "../actions/blogs";
 
 const TokenPage = async () => {
   const session = await auth();
@@ -13,7 +14,12 @@ const TokenPage = async () => {
   }
 
   const user = await getCurrentUser();
-  const blogs = user.readingList.map((entry) => entry.blog);
+  const readBlogs = user.readingList
+    .filter((entry) => entry.read)
+    .map((entry) => entry.blog);
+  const unreadBlogs = user.readingList
+    .filter((entry) => !entry.read)
+    .map((entry) => entry.blog);
 
   if (!user) {
     redirect("/login");
@@ -36,24 +42,61 @@ const TokenPage = async () => {
       <div className="mb-4 flex flex-col gap-4">
         <h2 className="text-xl font-semibold ">Reading List</h2>
         <ul>
-          {blogs.length ? (
-            blogs.map((blog) => (
-              <li key={blog.id}>
-                <Link href={`/blogs/${blog.id}`}>
-                  <div className="w-full mb-2 px-6 py-4 rounded-xl border border-zinc-700 hover:border-zinc-500 transition-colors">
-                    <div className="w-full flex flex-col gap-2">
-                      <p className="text-xl capitalize font-semibold text-zinc-100">
-                        {blog.title}
-                      </p>
-                      <p className="text-sm text-zinc-400">by {blog.author}</p>
-                      <p className="text-sm text-zinc-500">
-                        ♥ {blog.likes} likes
-                      </p>
-                    </div>
+          {readBlogs.length + unreadBlogs.length ? (
+            <div>
+              <h3 className="text-lg font-semibold mb-4">
+                Unread ({unreadBlogs.length})
+              </h3>
+              {unreadBlogs.map((blog) => (
+                <li key={blog.id}>
+                  <div className="w-full mb-2 px-6 py-4 rounded-xl border border-zinc-700 hover:border-zinc-500 transition-colors flex flex-row">
+                    <Link href={`/blogs/${blog.id}`}>
+                      <div className="w-full flex flex-col gap-2">
+                        <p className="text-xl capitalize font-semibold text-zinc-100">
+                          {blog.title}
+                        </p>
+                        <p className="text-sm text-zinc-400">
+                          by {blog.author}
+                        </p>
+                        <p className="text-sm text-zinc-500">
+                          ♥ {blog.likes} likes
+                        </p>
+                      </div>
+                    </Link>
+                    <form
+                      action={markBlogAsReadForCurrentUser.bind(null, blog.id)}
+                      className="ml-auto"
+                    >
+                      <button className="py-1 px-4 bg-zinc-50 text-zinc-900 rounded cursor-pointer">
+                        mark as read
+                      </button>
+                    </form>
                   </div>
-                </Link>
-              </li>
-            ))
+                </li>
+              ))}
+              <h3 className="text-lg font-semibold my-4">
+                Read ({readBlogs.length})
+              </h3>
+              {readBlogs.map((blog) => (
+                <li key={blog.id}>
+                  <Link href={`/blogs/${blog.id}`}>
+                    <div className="w-full mb-2 px-6 py-4 rounded-xl border border-zinc-700 hover:border-zinc-500 transition-colors">
+                      <div className="w-full flex flex-col gap-2">
+                        <p className="text-xl capitalize font-semibold text-zinc-100">
+                          {blog.title}
+                        </p>
+                        <p className="text-sm text-zinc-400">
+                          by {blog.author}
+                        </p>
+                        <p className="text-sm text-zinc-500">
+                          ♥ {blog.likes} likes
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </div>
           ) : (
             <p className="text-zinc-400">No blogs in the readlist yet</p>
           )}

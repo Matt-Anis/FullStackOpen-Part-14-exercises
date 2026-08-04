@@ -63,7 +63,9 @@ export const getCurrentUser = async () => {
     columns: { passwordHash: false },
     with: {
       readingList: {
-        columns: {},
+        columns: {
+          read: true,
+        },
         with: {
           blog: true,
         },
