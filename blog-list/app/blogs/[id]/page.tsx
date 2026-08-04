@@ -1,7 +1,13 @@
 import { getById } from "@/app/services/blogs";
 import { notFound } from "next/navigation";
-import { likeBlog } from "@/app/actions/blogs";
+import {
+  isBlogInReadingListOfCurrentUser,
+  likeBlog,
+  addBlogToReadingListOfCurrentUser,
+  removeBlogFromReadingListOfCurrentUser,
+} from "@/app/actions/blogs";
 import Link from "next/link";
+import { auth } from "@/auth";
 
 const BlogPage = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
@@ -10,6 +16,10 @@ const BlogPage = async ({ params }: { params: Promise<{ id: string }> }) => {
   if (!blog) {
     notFound();
   }
+
+  const session = await auth();
+
+  const isInReadingList = await isBlogInReadingListOfCurrentUser(Number(id));
 
   return (
     <div className="mx-10 my-6 flex flex-col gap-6 w-full">
@@ -42,15 +52,35 @@ const BlogPage = async ({ params }: { params: Promise<{ id: string }> }) => {
         </p>
       </div>
 
-      <form action={likeBlog}>
-        <input type="hidden" name="id" value={blog.id} />
-        <button
-          type="submit"
-          className="px-6 py-2 rounded-lg bg-zinc-50 text-zinc-900"
-        >
-          Like
-        </button>
-      </form>
+      <div className="flex flex-row gap-4">
+        <form action={likeBlog}>
+          <input type="hidden" name="id" value={blog.id} />
+          <button
+            type="submit"
+            className="px-6 py-2 rounded-lg bg-zinc-50 text-zinc-900"
+          >
+            Like
+          </button>
+        </form>
+        {session && (
+          <form
+            action={
+              isInReadingList
+                ? removeBlogFromReadingListOfCurrentUser.bind(null, blog.id)
+                : addBlogToReadingListOfCurrentUser.bind(null, blog.id)
+            }
+          >
+            <button
+              type="submit"
+              className="px-6 py-2 rounded-lg border border-zinc-600 cursor-pointer"
+            >
+              {isInReadingList
+                ? "Remove from reading list"
+                : "Add to reading list"}
+            </button>
+          </form>
+        )}
+      </div>
     </div>
   );
 };

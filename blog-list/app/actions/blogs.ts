@@ -3,6 +3,10 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { addBlog, likeBlog as updateBlogLikes } from "../services/blogs";
+import { auth } from "@/auth";
+import { db } from "@/db";
+import { readingList } from "@/db/schema";
+import { and, eq } from "drizzle-orm";
 
 type BlogFormState = {
   errors: {
@@ -60,4 +64,52 @@ export const searchBlogs = async (formData: FormData) => {
   const keyword = formData.get("keyword") as string;
   if (!keyword.trim()) redirect("/blogs");
   redirect(`/blogs?filter=${encodeURIComponent(keyword)}`);
+};
+
+export const isBlogInReadingListOfCurrentUser = async (blogId: number) => {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return false;
+  }
+
+  const entry = await db.query.readingList.findFirst({
+    where: and(
+      eq(readingList.userId, Number(session.user?.id)),
+      eq(readingList.blogId, blogId),
+    ),
+  });
+
+  return !!entry;
+};
+
+export const addBlogToReadingListOfCurrentUser = async (blogId: number) => {
+  const session = await auth();
+  if (!session) throw new Error("Unauthorized");
+
+  await db
+    .insert(readingList)
+    .values({ userId: Number(session.user?.id), blogId })
+    .onConflictDoNothing();
+
+  revalidatePath(`/blogs/${blogId}`);
+};
+
+export const removeBlogFromReadingListOfCurrentUser = async (
+  blogId: number,
+) => {
+  const session = await auth();
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+
+  await db
+    .delete(readingList)
+    .where(
+      and(
+        eq(readingList.blogId, blogId),
+        eq(readingList.userId, Number(session.user?.id)),
+      ),
+    );
+
+  revalidatePath(`/blogs/${blogId}`);
 };

@@ -61,6 +61,14 @@ export const getCurrentUser = async () => {
   const user = await db.query.users.findFirst({
     where: eq(users.username, session.user.email),
     columns: { passwordHash: false },
+    with: {
+      readingList: {
+        columns: {},
+        with: {
+          blog: true,
+        },
+      },
+    },
   });
   if (!user) {
     throw new Error("User not found");
