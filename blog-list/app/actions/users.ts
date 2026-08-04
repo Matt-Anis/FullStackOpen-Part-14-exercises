@@ -4,6 +4,8 @@ import bcrypt from "bcryptjs";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
+import { auth } from "@/auth";
 
 type RegisterState = {
   errors: {
@@ -49,4 +51,32 @@ export const registerUser = async (
   const passwordHash = await bcrypt.hash(password, 10);
   await db.insert(users).values({ username, name, passwordHash });
   redirect("/login");
+};
+
+export const getCurrentUser = async () => {
+  const session = await auth();
+  if (!session?.user?.email) {
+    throw new Error("Unauthorized");
+  }
+  const user = await db.query.users.findFirst({
+    where: eq(users.username, session.user.email),
+    columns: { passwordHash: false },
+  });
+  if (!user) {
+    throw new Error("User not found");
+  }
+  return user;
+};
+
+export const generateUserToken = async () => {
+  const session = await auth();
+  if (!session?.user?.email) {
+    throw new Error("Unauthorized");
+  }
+  const token = crypto.randomUUID();
+  await db
+    .update(users)
+    .set({ token })
+    .where(eq(users.username, session.user.email));
+  revalidatePath("/me");
 };

@@ -24,8 +24,9 @@ export default function NavBar() {
       <NavLink href="/blogs">blogs</NavLink>
       <NavLink href="/users">users</NavLink>
       {session ? (
-        <div className="ml-auto flex gap-4">
-          <Link href="/blogs/new">create new</Link>
+        <div className="ml-auto flex gap-4 items-center">
+          <NavLink href="/blogs/new">create new</NavLink>
+          <NavLink href="/me">me</NavLink>
           <em>{session.user?.name} logged in</em>{" "}
           <button
             className="bg-zinc-50 py-1 px-4 rounded-full text-zinc-800 hover:bg-zinc-200 hover:text-zinc-600 cursor-pointer"
