@@ -28,6 +28,7 @@ export const NotificationProvider = ({
     msg: string,
     notifType: NotificationType = "success",
   ) => {
+    console.log("DEBUG: notification", msg);
     setMessage(msg);
     setType(notifType);
     setTimeout(() => setMessage(""), 5000);

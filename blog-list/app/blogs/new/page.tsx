@@ -1,18 +1,22 @@
 "use client";
-
 import { createBlog } from "@/app/actions/blogs";
-import { useSession } from "next-auth/react";
+import { useNotification } from "@/app/components/NotificationContext";
 import { redirect } from "next/navigation";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 
 const NewBlog = () => {
-  const { status } = useSession();
+  const [state, formAction] = useActionState(createBlog, {
+    errors: {},
+    success: false,
+  });
+  const { showNotification } = useNotification();
 
-  if (status !== "authenticated") {
-    redirect("/login");
-  }
-
-  const [state, formAction] = useActionState(createBlog, { errors: {} });
+  useEffect(() => {
+    if (state.success) {
+      showNotification("Blog added successfully");
+      redirect("/blogs");
+    }
+  }, [state, showNotification]);
 
   return (
     <div className="mx-10 my-6 flex flex-col gap-6">
@@ -23,8 +27,11 @@ const NewBlog = () => {
         className="flex flex-col gap-4 p-6 rounded-xl border border-zinc-700 max-w-lg"
       >
         <div className="flex flex-col gap-1">
-          <label className="text-sm text-zinc-400">Title</label>
+          <label htmlFor="title" className="text-sm text-zinc-400">
+            Title
+          </label>
           <input
+            id="title"
             name="title"
             required
             minLength={5}
@@ -37,8 +44,11 @@ const NewBlog = () => {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-sm text-zinc-400">Author</label>
+          <label htmlFor="author" className="text-sm text-zinc-400">
+            Author
+          </label>
           <input
+            id="author"
             name="author"
             required
             minLength={5}
@@ -51,8 +61,11 @@ const NewBlog = () => {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-sm text-zinc-400">URL</label>
+          <label htmlFor="url" className="text-sm text-zinc-400">
+            URL
+          </label>
           <input
+            id="url"
             name="url"
             required
             minLength={5}
@@ -66,6 +79,7 @@ const NewBlog = () => {
 
         <button
           type="submit"
+          data-testid="create-blog-button"
           className="self-start px-6 py-2 rounded-lg border border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-zinc-100 transition-colors"
         >
           Create

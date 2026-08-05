@@ -19,6 +19,7 @@ type BlogFormState = {
     author: string;
     url: string;
   };
+  success: boolean;
 };
 
 export const createBlog = async (
@@ -33,25 +34,32 @@ export const createBlog = async (
     return {
       errors: { title: "minimum length for title is 5 characters long" },
       values: { title, author, url },
+      success: false,
     };
   }
   if (!author || author.length < 5) {
     return {
       errors: { author: "minimum length for author is 5 characters long" },
       values: { title, author, url },
+      success: false,
     };
   }
   if (!url || url.length < 5) {
     return {
       errors: { url: "minimum length for url is 5 characters long" },
       values: { title, author, url },
+      success: false,
     };
   }
 
   await addBlog(title, author, url);
 
   revalidatePath("/blogs");
-  redirect("/blogs");
+  return {
+    errors: {},
+    values: { title, author, url },
+    success: true,
+  };
 };
 
 export const likeBlog = async (formData: FormData) => {

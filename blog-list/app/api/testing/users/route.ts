@@ -1,5 +1,6 @@
 import { db } from "@/db";
 import { users } from "@/db/schema";
+import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 
 type UserType = {
@@ -17,8 +18,10 @@ export const POST = async (req: NextRequest) => {
   }
 
   const user: UserType = await req.json();
+  const passwordHash = await bcrypt.hash(user.password, 10);
+  await db
+    .insert(users)
+    .values({ username: user.username, name: user.name, passwordHash });
 
-  await db.insert(users).values(user);
-
-  return NextResponse.json({ status: 200 });
+  return NextResponse.json({ message: "ok" });
 };

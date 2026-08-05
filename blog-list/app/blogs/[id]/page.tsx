@@ -22,12 +22,12 @@ const BlogPage = async ({ params }: { params: Promise<{ id: string }> }) => {
   const isInReadingList = await isBlogInReadingListOfCurrentUser(Number(id));
 
   return (
-    <div className="mx-10 my-6 flex flex-col gap-6 w-full">
+    <div data-testid="blog-detail" className="mx-10 my-6 flex flex-col gap-6 w-full">
       <div className="flex flex-col gap-1">
-        <h2 className="text-4xl font-bold font-mono capitalize text-zinc-100">
+        <h2 data-testid="blog-title" className="text-4xl font-bold font-mono capitalize text-zinc-100">
           {blog.title}
         </h2>
-        <p className="text-zinc-400 text-sm">by {blog.author}</p>
+        <p data-testid="blog-author" className="text-zinc-400 text-sm">by {blog.author}</p>
       </div>
 
       <div className="flex flex-col gap-3 p-6 rounded-xl border border-zinc-700">
@@ -72,6 +72,7 @@ const BlogPage = async ({ params }: { params: Promise<{ id: string }> }) => {
           >
             <button
               type="submit"
+              data-testid="add-to-reading-list-button"
               className="px-6 py-2 rounded-lg border border-zinc-600 cursor-pointer"
             >
               {isInReadingList

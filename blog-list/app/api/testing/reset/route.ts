@@ -1,5 +1,6 @@
 import { db } from "@/db";
 import { blogs, readingList, users } from "@/db/schema";
+import { sql } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 export const DELETE = async (req: NextRequest) => {
@@ -10,9 +11,9 @@ export const DELETE = async (req: NextRequest) => {
     );
   }
 
-  await db.delete(readingList);
-  await db.delete(blogs);
-  await db.delete(users);
+  await db.execute(
+    sql`TRUNCATE users, blogs, reading_list RESTART IDENTITY CASCADE`,
+  );
 
-  return NextResponse.json({ status: 200 });
+  return NextResponse.json({ message: "ok" });
 };

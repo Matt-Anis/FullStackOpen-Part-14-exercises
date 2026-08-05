@@ -13,7 +13,7 @@ export default function Notification() {
   };
 
   return (
-    <div className={`py-2.5 px-4 mb-2.5 rounded text-white ${bgColor[type]}`}>
+    <div data-testid="notification" className={`py-2.5 px-4 mb-2.5 rounded text-white ${bgColor[type]}`}>
       {message}
     </div>
   );

@@ -3,7 +3,7 @@
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNotification } from "../components/NotificationContext";
 
 export default function LoginPage() {
@@ -11,24 +11,21 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const { showNotification } = useNotification();
 
-  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-
     const result = await signIn("credentials", {
       username: formData.get("username"),
       password: formData.get("password"),
       redirect: false,
     });
 
-    if (result?.error) {
-      setError("Invalid username or password");
-    } else {
-      setTimeout(() => {
-        showNotification("successfully logged in");
-      }, 2000);
+    console.log("DEBUG: result", result);
+    if (!result.error) {
+      showNotification("Successfully logged in");
       router.push("/");
-      router.refresh();
+    } else {
+      setError("Invalid username or password");
     }
   };
 
@@ -38,14 +35,21 @@ export default function LoginPage() {
       <h2 className="flex self-center text-4xl font-bold font-mono text-zinc-100">
         Login
       </h2>
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {error && (
+        <p data-testid="error-message" className="text-red-500 text-sm">
+          {error}
+        </p>
+      )}
       <form
         onSubmit={handleSubmit}
         className="flex flex-col gap-4 p-6 rounded-xl border border-zinc-700"
       >
         <div className="flex flex-col gap-1">
-          <label className="text-sm text-zinc-400">Username</label>
+          <label htmlFor="username" className="text-sm text-zinc-400">
+            Username
+          </label>
           <input
+            id="username"
             type="text"
             name="username"
             required
@@ -54,8 +58,11 @@ export default function LoginPage() {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-sm text-zinc-400">Password</label>
+          <label htmlFor="password" className="text-sm text-zinc-400">
+            Password
+          </label>
           <input
+            id="password"
             type="password"
             name="password"
             required
@@ -65,6 +72,7 @@ export default function LoginPage() {
 
         <button
           type="submit"
+          data-testid="login-button"
           className="w-full mt-4 px-6 py-2 rounded-lg bg-zinc-50 text-zinc-900 cursor-pointer"
         >
           Login

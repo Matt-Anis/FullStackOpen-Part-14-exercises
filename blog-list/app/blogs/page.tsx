@@ -18,18 +18,20 @@ const Blogs = async ({
           <input
             type="text"
             name="keyword"
+            data-testid="filter-input"
             placeholder="Search blogs..."
             className="w-full py-2 px-4 text-sm text-zinc-50 placeholder:text-zinc-300 border border-zinc-50 rounded-full"
           />
           <button
             type="submit"
+            data-testid="search-button"
             className="py-2 px-4 bg-zinc-100 text-zinc-900 rounded-full"
           >
             Search
           </button>
         </form>
       </div>
-      <ul>
+      <ul data-testid="blogs-list">
         {blogs.map((blog) => (
           <li key={blog.id}>
             <Link href={`/blogs/${blog.id}`}>
